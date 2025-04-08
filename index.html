@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>숫자야구 게임</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      padding: 30px;
+    }
+    h1 {
+      color: #333;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 100px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #555;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚾ 숫자야구 게임</h1>
+  <p>1~9까지 서로 다른 숫자 3개를 입력하세요 (예: 123)</p>
+  <input type="text" id="userInput" maxlength="3" placeholder="123">
+  <button onclick="checkAnswer()">확인</button>
+  <button onclick="resetGame()">다시하기</button>
+  <div id="result"></div>
+  <ul id="log"></ul>
+
+  <script>
+    let answer = [];
+
+    function generateAnswer() {
+      const digits = [1,2,3,4,5,6,7,8,9];
+      while (answer.length < 3) {
+        const randIndex = Math.floor(Math.random() * digits.length);
+        const num = digits.splice(randIndex, 1)[0];
+        answer.push(num);
+      }
+      console.log('정답:', answer.join(''));
+    }
+
+    function checkAnswer() {
+      const input = document.getElementById('userInput').value;
+      const result = document.getElementById('result');
+      const log = document.getElementById('log');
+
+      if (input.length !== 3 || /[^1-9]/.test(input)) {
+        result.innerText = '1~9 사이의 서로 다른 숫자 3자리를 입력하세요!';
+        return;
+      }
+
+      const userNums = input.split('').map(Number);
+      if (new Set(userNums).size !== 3) {
+        result.innerText = '숫자는 중복되면 안 됩니다!';
+        return;
+      }
+
+      let strike = 0, ball = 0;
+      for (let i = 0; i < 3; i++) {
+        if (userNums[i] === answer[i]) strike++;
+        else if (answer.includes(userNums[i])) ball++;
+      }
+
+      const msg = `${input} → ${strike} 스트라이크, ${ball} 볼`;
+      const li = document.createElement('li');
+      li.innerText = msg;
+      log.appendChild(li);
+
+      if (strike === 3) {
+        result.innerText = '🎉 정답입니다! 축하합니다!';
+      } else {
+        result.innerText = `${strike}S ${ball}B`;
+      }
+
+      document.getElementById('userInput').value = '';
+      document.getElementById('userInput').focus();
+    }
+
+    function resetGame() {
+      answer = [];
+      generateAnswer();
+      document.getElementById('result').innerText = '';
+      document.getElementById('log').innerHTML = '';
+      document.getElementById('userInput').value = '';
+      document.getElementById('userInput').focus();
+    }
+
+    generateAnswer();
+  </script>
+</body>
+</html>
